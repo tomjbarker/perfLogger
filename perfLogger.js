@@ -24,9 +24,9 @@ var perfLogger = {
 	logBenchmark: function(id, timestoIterate, func){
 		var timeSum = 0;
 		for(var x = 0; x < timestoIterate; x++){
-			perfLogger.startLogging(id, "benchmarking function "+ func);
+			perfLogger.startTimeLogging(id, "benchmarking function "+ func);
 			func();
-			timeSum += perfLogger.stopLogging(id).runtime
+			timeSum += perfLogger.stopTimeLogging(id).runtime
 		}
 		return {
 			avgRunTime: timeSum/timestoIterate,
