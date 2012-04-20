@@ -17,7 +17,8 @@ var perfLogger = {
 			resultID: id,
 			starttime: perfLogger.loggerPool[id].startTime,
 			stoptime: perfLogger.loggerPool[id].stopTime,
-			url:window.location
+			url:window.location,
+			useragent: window.useragent
 		}
 	},
 	
@@ -30,7 +31,9 @@ var perfLogger = {
 		}
 		return {
 			avgRunTime: timeSum/timestoIterate,
-			description: "benchmarking function "+ func
+			description: "benchmarking function "+ func,
+			url:window.location,
+			useragent: window.useragent
 		}
 	}
 }
