@@ -1,0 +1,36 @@
+var perfLogger = {
+	loggerPool: [],
+	startTimeLogging: function(id, descr){
+		perfLogger.loggerPool[id] = {};
+		perfLogger.loggerPool[id].startTime = new Date;
+		perfLogger.loggerPool[id].description = descr;
+	},
+	
+	stopTimeLogging: function(id){
+		perfLogger.loggerPool[id].stopTime = new Date;
+		return perfLogger.showResults(id);
+	},
+	
+	showResults: function(id){
+		return {
+			runtime: perfLogger.loggerPool[id].stopTime - perfLogger.loggerPool[id].startTime,
+			resultID: id,
+			starttime: perfLogger.loggerPool[id].startTime,
+			stoptime: perfLogger.loggerPool[id].stopTime,
+			url:window.location
+		}
+	},
+	
+	logBenchmark: function(id, timestoIterate, func){
+		var timeSum = 0;
+		for(var x = 0; x < timestoIterate; x++){
+			perfLogger.startLogging(id, "benchmarking function "+ func);
+			func();
+			timeSum += perfLogger.stopLogging(id).runtime
+		}
+		return {
+			avgRunTime: timeSum/timestoIterate,
+			description: "benchmarking function "+ func
+		}
+	}
+}
