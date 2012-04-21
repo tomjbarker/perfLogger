@@ -1,39 +1,66 @@
 var perfLogger = {
 	loggerPool: [],
-	startTimeLogging: function(id, descr){
+	startTimeLogging: function(id, descr,drawToPage){
 		perfLogger.loggerPool[id] = {};
+		perfLogger.loggerPool[id].id = id;
 		perfLogger.loggerPool[id].startTime = new Date;
 		perfLogger.loggerPool[id].description = descr;
+		perfLogger.loggerPool[id].drawtopage = drawToPage;
 	},
 	
 	stopTimeLogging: function(id){
 		perfLogger.loggerPool[id].stopTime = new Date;
-		return perfLogger.showResults(id);
+		perfLogger.showResults(id);
+		if(perfLogger.loggerPool[id].drawtopage){
+			perfLogger.drawToDebugScreen(id)
+		}
+	//	return perfLogger.showResults(id);
 	},
 	
 	showResults: function(id){
-		return {
-			runtime: perfLogger.loggerPool[id].stopTime - perfLogger.loggerPool[id].startTime,
-			resultID: id,
-			starttime: perfLogger.loggerPool[id].startTime,
-			stoptime: perfLogger.loggerPool[id].stopTime,
-			url:window.location,
-			useragent: window.useragent
-		}
+		perfLogger.loggerPool[id].runtime = perfLogger.loggerPool[id].stopTime - perfLogger.loggerPool[id].startTime;
+		perfLogger.loggerPool[id].url = window.location;
+		perfLogger.loggerPool[id].useragent = navigator.userAgent;
+		return perfLogger.loggerPool[id]
 	},
 	
 	logBenchmark: function(id, timestoIterate, func){
 		var timeSum = 0;
 		for(var x = 0; x < timestoIterate; x++){
-			perfLogger.startTimeLogging(id, "benchmarking function "+ func);
+			perfLogger.startTimeLogging(id, "benchmarking "+ func);
 			func();
-			timeSum += perfLogger.stopTimeLogging(id).runtime
+			perfLogger.stopTimeLogging(id)
+			timeSum += perfLogger.loggerPool[id].runtime
 		}
-		return {
-			avgRunTime: timeSum/timestoIterate,
-			description: "benchmarking function "+ func,
-			url:window.location,
-			useragent: window.useragent
+		perfLogger.loggerPool[id].drawtopage = drawToPage;
+		perfLogger.loggerPool[id].avgRunTime = timeSum/timestoIterate
+			if(perfLogger.loggerPool[id].drawtopage){
+				perfLogger.drawToDebugScreen(id)
+			}
+	},
+	formatDebugInfo: function(id){
+		var debuginfo = "<p><strong>" + perfLogger.loggerPool[id].description + "</strong><br/>";	
+		if(perfLogger.loggerPool[id].avgRunTime){
+			debuginfo += "average run time: " + perfLogger.loggerPool[id].avgRunTime + "ms<br/>";
+		}else{
+			debuginfo += "run time: " + perfLogger.loggerPool[id].runtime + "ms<br/>";
+		}
+		debuginfo += "path: " + perfLogger.loggerPool[id].url + "<br/>";
+		debuginfo += "useragent: " +  perfLogger.loggerPool[id].useragent + "<br/>";
+		debuginfo += "</p>";
+		return debuginfo
+	},
+	
+	drawToDebugScreen: function(id){
+		var debug = document.getElementById("debug")
+		var output = perfLogger.formatDebugInfo(id)
+		if(!debug){
+			var divTag = document.createElement("div");
+			divTag.id = "debug";
+			divTag.innerHTML = output
+			document.body.appendChild(divTag); 		  
+		}else{
+			debug.innerHTML += output
 		}
 	}
 }
