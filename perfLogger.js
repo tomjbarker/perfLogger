@@ -24,19 +24,22 @@ var perfLogger = {
 		return perfLogger.loggerPool[id]
 	},
 	
-	logBenchmark: function(id, timestoIterate, func){
+	logBenchmark: function(id, timestoIterate, func, drawToPage){
+		console.log("benchmarking " + id)
 		var timeSum = 0;
 		for(var x = 0; x < timestoIterate; x++){
-			perfLogger.startTimeLogging(id, "benchmarking "+ func);
+			perfLogger.startTimeLogging(id, "benchmarking "+ func,true);
 			func();
 			perfLogger.stopTimeLogging(id)
 			timeSum += perfLogger.loggerPool[id].runtime
 		}
+		console.log(perfLogger.loggerPool[id])
 		perfLogger.loggerPool[id].drawtopage = drawToPage;
 		perfLogger.loggerPool[id].avgRunTime = timeSum/timestoIterate
 			if(perfLogger.loggerPool[id].drawtopage){
 				perfLogger.drawToDebugScreen(id)
 			}
+		console.log("finished benchmarking " + id)	
 	},
 	formatDebugInfo: function(id){
 		var debuginfo = "<p><strong>" + perfLogger.loggerPool[id].description + "</strong><br/>";	
