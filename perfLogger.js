@@ -23,7 +23,7 @@ var perfLogger = {
 	
 	showResults: function(id){
 		perfLogger.loggerPool[id].runtime = perfLogger.loggerPool[id].stopTime - perfLogger.loggerPool[id].startTime;
-		perfLogger.loggerPool[id].url = window.location;
+		perfLogger.loggerPool[id].url = window.location.href;
 		perfLogger.loggerPool[id].useragent = navigator.userAgent;
 		return perfLogger.loggerPool[id]
 	},
