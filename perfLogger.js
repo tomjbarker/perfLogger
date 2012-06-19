@@ -1,20 +1,24 @@
 var perfLogger = {
 	loggerPool: [],
-	startTimeLogging: function(id, descr,drawToPage){
+	serverLogURL: "savePerfData.php",
+	startTimeLogging: function(id, descr,drawToPage,logToServer){
 		perfLogger.loggerPool[id] = {};
 		perfLogger.loggerPool[id].id = id;
 		perfLogger.loggerPool[id].startTime = new Date;
 		perfLogger.loggerPool[id].description = descr;
 		perfLogger.loggerPool[id].drawtopage = drawToPage;
+		perfLogger.loggerPool[id].logtoserver = logToServer
 	},
 	
 	stopTimeLogging: function(id){
 		perfLogger.loggerPool[id].stopTime = new Date;
 		perfLogger.showResults(id);
 		if(perfLogger.loggerPool[id].drawtopage){
-			perfLogger.drawToDebugScreen(id)
+			perfLogger.drawToDebugScreen(id);
 		}
-	//	return perfLogger.showResults(id);
+		if(perfLogger.loggerPool[id].logtoserver){
+			perfLogger.logToServer(id);
+		}
 	},
 	
 	showResults: function(id){
@@ -24,22 +28,19 @@ var perfLogger = {
 		return perfLogger.loggerPool[id]
 	},
 	
-	logBenchmark: function(id, timestoIterate, func, drawToPage){
-		console.log("benchmarking " + id)
+	logBenchmark: function(id, timestoIterate, func, drawToPage, logToServer){
 		var timeSum = 0;
 		for(var x = 0; x < timestoIterate; x++){
-			perfLogger.startTimeLogging(id, "benchmarking "+ func,true);
+			perfLogger.startTimeLogging(id, "benchmarking "+ func,drawToPage, logToServer);
 			func();
 			perfLogger.stopTimeLogging(id)
 			timeSum += perfLogger.loggerPool[id].runtime
 		}
-		console.log(perfLogger.loggerPool[id])
 		perfLogger.loggerPool[id].drawtopage = drawToPage;
 		perfLogger.loggerPool[id].avgRunTime = timeSum/timestoIterate
 			if(perfLogger.loggerPool[id].drawtopage){
 				perfLogger.drawToDebugScreen(id)
 			}
-		console.log("finished benchmarking " + id)	
 	},
 	formatDebugInfo: function(id){
 		var debuginfo = "<p><strong>" + perfLogger.loggerPool[id].description + "</strong><br/>";	
@@ -65,5 +66,25 @@ var perfLogger = {
 		}else{
 			debug.innerHTML += output
 		}
+	},
+	
+	logToServer: function(id){
+		var params = "data=" + (JSON.stringify(perfLogger.loggerPool[id]));
+		var xhr = XMLHttpRequest();
+		xhr.open("POST", perfLogger.serverLogURL, true);
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		xhr.setRequestHeader("Content-length", params.length);
+		xhr.setRequestHeader("Connection", "close");
+		xhr.onreadystatechange = function()
+		  {
+		  if (xhr.readyState==4 && xhr.status==200)
+		    {
+		    	console.log(xhr.responseText);
+		    }
+		  };
+		xhr.send(params);
+		
+
+		
 	}
 }
