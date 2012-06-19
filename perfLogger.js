@@ -70,7 +70,7 @@ var perfLogger = {
 	
 	logToServer: function(id){
 		var params = "data=" + (JSON.stringify(perfLogger.loggerPool[id]));
-		var xhr = XMLHttpRequest();
+		var xhr = new XMLHttpRequest();
 		xhr.open("POST", perfLogger.serverLogURL, true);
 		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 		xhr.setRequestHeader("Content-length", params.length);
