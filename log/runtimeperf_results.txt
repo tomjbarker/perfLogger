@@ -1,0 +1,2 @@
+IP, TestID, StartTime, StopTime, RunTime, URL, UserAgent
+::1,for_loop,2012-06-19T16:51:23.030Z,2012-06-19T16:51:23.030Z,0,http://localhost:8888/lab/perfLogger_example.html,Mozilla/5.0 (Macintosh; Intel Mac OS X 10.5; rv:13.0) Gecko/20100101 Firefox/13.0
