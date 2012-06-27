@@ -4,9 +4,11 @@ var perfLogger = function(){
 		
 		function calculateResults(id){
 			loggerPool[id].runtime = loggerPool[id].stopTime - loggerPool[id].startTime;
+		}
+		
+		function setResultsMetaData(id){
 			loggerPool[id].url = window.location.href;
 			loggerPool[id].useragent = navigator.userAgent;
-			return loggerPool[id]
 		}
 		
 		function drawToDebugScreen(id){
@@ -56,15 +58,16 @@ var perfLogger = function(){
 	startTimeLogging: function(id, descr,drawToPage,logToServer){
 		loggerPool[id] = {};
 		loggerPool[id].id = id;
-		loggerPool[id].startTime = new Date;
+		loggerPool[id].startTime =  performance.now();
 		loggerPool[id].description = descr;
 		loggerPool[id].drawtopage = drawToPage;
 		loggerPool[id].logtoserver = logToServer
 	},
 	
 	stopTimeLogging: function(id){
-		loggerPool[id].stopTime = new Date;
+		loggerPool[id].stopTime =  performance.now();
 		calculateResults(id);
+		setResultsMetaData(id);
 		if(loggerPool[id].drawtopage){
 			drawToDebugScreen(id);
 		}
@@ -74,19 +77,30 @@ var perfLogger = function(){
 	},
 	
 	
-	logBenchmark: function(id, timestoIterate, func, drawToPage, logToServer){
+	logBenchmark: function(id, timestoIterate, func, debug, log){
 		var timeSum = 0;
 		for(var x = 0; x < timestoIterate; x++){
-			perfLogger.startTimeLogging(id, "benchmarking "+ func,drawToPage, logToServer);
+			perfLogger.startTimeLogging(id, "benchmarking "+ func, false, false);
 			func();
 			perfLogger.stopTimeLogging(id)
 			timeSum += loggerPool[id].runtime
 		}
-		loggerPool[id].drawtopage = drawToPage;
 		loggerPool[id].avgRunTime = timeSum/timestoIterate
-			if(loggerPool[id].drawtopage){
+		if(debug){
 				drawToDebugScreen(id)
-			}
+		}
+		if(log){
+				logToServer(id)
+		}
 	}
 }
 }();
+
+performance.now = (function() {
+  return performance.now       ||
+         performance.mozNow    ||
+         performance.msNow     ||
+         performance.oNow      ||
+         performance.webkitNow ||
+         function() { return new Date().getTime(); };
+})();
