@@ -48,9 +48,7 @@ var perfLogger = function(){
 		}
 
 		function logToServer(id){
-			
 			var params = "data=" + JSON.stringify(jsonConcat(loggerPool[id],TestResults.prototype));
-			console.log(params)
 			var xhr = new XMLHttpRequest();
 			xhr.open("POST", serverLogURL, true);
 			xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -58,10 +56,7 @@ var perfLogger = function(){
 			xhr.setRequestHeader("Connection", "close");
 			xhr.onreadystatechange = function()
 			  {
-			  if (xhr.readyState==4 && xhr.status==200)
-			    {
-			    	//console.log(xhr.responseText);
-			    }
+			  if (xhr.readyState==4 && xhr.status==200){}
 			  };
 			xhr.send(params);	
 		}
